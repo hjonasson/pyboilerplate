@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import sys
+import os
 
 '''
 Parameters
@@ -8,7 +9,8 @@ Parameters
 filename , args = sys.argv[ 1 ] , sys.argv[ 2: ]
 keysImports = { 'plt' : 'seaborn as sns\nimport matplotlib.pylab as plt ' ,
 				'pd' : 'pandas as pd' ,
-				'np' : 'numpy as np'
+				'np' : 'numpy as np' ,
+				'ss' : 'scipy.stats as ss'
 				}
 
 '''
@@ -52,13 +54,13 @@ reqPseuInds = map( lambda i : i[ 0 ] , filter( lambda ( i , j ) : j == 'as' , en
 modPseu = map( lambda i : tuple( args[ i - 1 : i + 2 ] ) , reqPseuInds )
 
 # filter requested imports that are not predefined
-rINP = filter( lambda a : a not in reqImports + flatten( modPseu ) , args )
+rINP = filter( lambda a : a not in keysImports.keys() + flatten( modPseu ) , args )
 
 # create file with the requested filename
 f = open( filename.endswith( '.py' ) and filename or '%s.py' % filename , 'w' )
 
 # iterate over all imports to add
-for reqs in [ reqImports , rINP , modPseu ]:
+for reqs in filter( lambda i : i , [ reqImports , rINP , modPseu ] ):
 
 	# call writer function defined above
 	f = writer( f , reqs )
@@ -69,6 +71,8 @@ f.write( parts() )
 # save the file
 f.close()
 
+# open the file in sublime
+os.system( filename.endswith( '.py' ) and 'subl %s' % filename or 'subl %s.py' % filename )
 
 
 
